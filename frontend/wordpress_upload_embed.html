@@ -185,6 +185,7 @@
 /* ═══════════════════  DROP ZONE  ═══════════════════ */
 .hci-drop {
   position: relative;
+  display: block;
   border: 2px dashed rgba(27, 172, 178, 0.3);
   border-radius: var(--radius-md);
   padding: 28px 18px;
@@ -452,14 +453,14 @@
       </div>
 
       <!-- Drop Zone -->
-      <div class="hci-drop" id="hci-drop" aria-label="File drop zone">
+      <label class="hci-drop" id="hci-drop" for="hci-files" aria-label="File drop zone">
         <div class="hci-drop__icon" aria-hidden="true">&#8682;</div>
         <p class="hci-drop__lead">
           Drag claims files here, or <span class="hci-drop__browse" id="hci-browse">browse from device</span>
         </p>
         <p class="hci-drop__sub">Up to 4 files per batch &middot; CSV and Excel formats &middot; 50 MB max each</p>
         <input type="file" id="hci-files" name="files[]" accept=".csv,.xlsx,.xls" multiple>
-      </div>
+      </label>
 
       <!-- Selected Files -->
       <ul class="hci-files" id="hci-file-list" aria-live="polite"></ul>

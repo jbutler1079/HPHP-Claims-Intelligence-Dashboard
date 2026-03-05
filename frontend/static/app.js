@@ -190,14 +190,7 @@
   }
 
   // ═══════════════ EVENTS: FILE SELECTION ═══════════════
-  browse.addEventListener("click", function (e) {
-    e.stopPropagation(); fileInput.click();
-  });
-
-  drop.addEventListener("click", function () { fileInput.click(); });
-  drop.addEventListener("keydown", function (e) {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInput.click(); }
-  });
+  // Note: drop zone is a <label for="hci-files"> — browser opens file dialog natively on click.
 
   fileInput.addEventListener("change", function () { addFiles(fileInput.files); });
 
