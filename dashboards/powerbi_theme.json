@@ -1,0 +1,126 @@
+{
+  "name": "HPHP Claims Intelligence",
+  "dataColors": [
+    "#1BACB2",
+    "#5B7BFF",
+    "#FD6D06",
+    "#CF18AA",
+    "#FF0000",
+    "#10203B",
+    "#38BDF8",
+    "#A78BFA"
+  ],
+  "background": "#F6F8FB",
+  "foreground": "#10203B",
+  "tableAccent": "#1BACB2",
+  "visualStyles": {
+    "*": {
+      "*": {
+        "fontFamily": [{"value": "Source Serif 4"}],
+        "fontSize": [{"value": 12}],
+        "color": [{"solid": {"color": "#10203B"}}]
+      }
+    },
+    "title": {
+      "*": {
+        "fontFamily": [{"value": "Playfair Display"}],
+        "fontSize": [{"value": 18}],
+        "fontBold": [{"value": true}],
+        "color": [{"solid": {"color": "#CF18AA"}}]
+      }
+    },
+    "card": {
+      "*": {
+        "backgroundColor": [{"solid": {"color": "#ffffff"}}],
+        "border": [{"color": {"solid": {"color": "#e2e8f0"}}}],
+        "dropShadow": [{"value": true}]
+      },
+      "labels": {
+        "fontSize": [{"value": 34}],
+        "fontBold": [{"value": true}],
+        "color": [{"solid": {"color": "#10203B"}}]
+      }
+    },
+    "lineChart": {
+      "*": {
+        "dataColors": [
+          {"solid": {"color": "#1BACB2"}},
+          {"solid": {"color": "#5B7BFF"}},
+          {"solid": {"color": "#FD6D06"}},
+          {"solid": {"color": "#CF18AA"}}
+        ]
+      }
+    },
+    "barChart": {
+      "*": {
+        "dataColors": [{"solid": {"color": "#1BACB2"}}]
+      }
+    },
+    "donutChart": {
+      "*": {
+        "dataColors": [
+          {"solid": {"color": "#1BACB2"}},
+          {"solid": {"color": "#5B7BFF"}},
+          {"solid": {"color": "#FD6D06"}},
+          {"solid": {"color": "#CF18AA"}}
+        ]
+      }
+    },
+    "tableEx": {
+      "*": {
+        "header": {
+          "fontFamily": [{"value": "Playfair Display"}],
+          "fontBold": [{"value": true}],
+          "backgroundColor": [{"solid": {"color": "#1BACB2"}}],
+          "color": [{"solid": {"color": "#ffffff"}}]
+        },
+        "rows": {
+          "alternatingRowsColor": [{"solid": {"color": "#F6F8FB"}}]
+        }
+      }
+    },
+    "slicer": {
+      "*": {
+        "general": {
+          "outlineColor": [{"solid": {"color": "#1BACB2"}}]
+        },
+        "selection": {
+          "selectAllCheckboxEnabled": [{"value": true}],
+          "singleSelect": [{"value": false}]
+        }
+      }
+    },
+    "page": {
+      "*": {
+        "background": {
+          "color": [{"solid": {"color": "#F6F8FB"}}],
+          "transparency": [{"value": 0}]
+        }
+      }
+    }
+  },
+  "textClasses": {
+    "callout": {
+      "fontFace": "Playfair Display",
+      "color": "#10203B",
+      "fontSize": "30pt",
+      "fontWeight": "bold"
+    },
+    "title": {
+      "fontFace": "Playfair Display",
+      "color": "#CF18AA",
+      "fontSize": "18pt",
+      "fontWeight": "bold"
+    },
+    "header": {
+      "fontFace": "Playfair Display",
+      "color": "#10203B",
+      "fontSize": "12pt"
+    },
+    "label": {
+      "fontFace": "Source Serif 4",
+      "color": "#6b7280",
+      "fontSize": "10pt"
+    }
+  }
+}

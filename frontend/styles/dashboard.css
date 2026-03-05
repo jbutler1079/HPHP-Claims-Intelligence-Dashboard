@@ -1,0 +1,139 @@
+/* dashboard.css – Dashboard metrics grid and report styles */
+
+/* ── Metrics grid ──────────────────────────────────────────────────────────── */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.metric-card {
+  background: var(--bg-white);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg) var(--space-lg);
+  box-shadow: var(--shadow-md);
+  border-top: 3px solid var(--primary-teal);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  transition: box-shadow 0.2s;
+}
+
+.metric-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.metric-value {
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  font-family: var(--font-heading);
+  line-height: 1;
+}
+
+.metric-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+/* Alternate accent colours for metric cards */
+.metric-card:nth-child(2) { border-top-color: var(--accent-blue); }
+.metric-card:nth-child(3) { border-top-color: var(--accent-orange); }
+.metric-card:nth-child(4) { border-top-color: var(--accent-magenta); }
+
+/* ── Ingestion report ──────────────────────────────────────────────────────── */
+
+.report-placeholder {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: var(--space-lg) 0;
+}
+
+.report-overall {
+  font-size: 0.95rem;
+  margin-bottom: var(--space-md);
+  color: var(--text-dark);
+}
+
+.report-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-md);
+}
+
+.report-card--success {
+  border-left: 4px solid var(--primary-teal);
+  background: rgba(27, 172, 178, 0.03);
+}
+
+.report-card--error {
+  border-left: 4px solid var(--alert-red);
+  background: rgba(255, 0, 0, 0.03);
+}
+
+.report-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.report-filename {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-dark);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin-top: var(--space-sm);
+}
+
+.report-table th,
+.report-table td {
+  padding: 6px var(--space-sm);
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.report-table th {
+  width: 40%;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.report-table td {
+  color: var(--text-dark);
+}
+
+.report-error {
+  color: var(--alert-red);
+  font-size: 0.9rem;
+}
+
+/* ── Responsive grid ───────────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}

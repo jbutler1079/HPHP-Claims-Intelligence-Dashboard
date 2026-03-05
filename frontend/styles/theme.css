@@ -1,0 +1,114 @@
+/* theme.css – HPHP brand theme overrides and print / export styles */
+
+/* ── Scrollbar styling (Webkit) ────────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-light);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(27, 172, 178, 0.4);
+  border-radius: 100px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-teal);
+}
+
+/* ── Focus ring (accessibility) ────────────────────────────────────────────── */
+
+:focus-visible {
+  outline: 2px solid var(--primary-teal);
+  outline-offset: 2px;
+}
+
+/* ── Selection colour ──────────────────────────────────────────────────────── */
+
+::selection {
+  background: rgba(27, 172, 178, 0.2);
+  color: var(--text-dark);
+}
+
+/* ── Link decoration ───────────────────────────────────────────────────────── */
+
+a {
+  color: var(--primary-teal);
+}
+
+a:hover {
+  color: var(--accent-blue);
+}
+
+/* ── Heading accent line ───────────────────────────────────────────────────── */
+
+.card h2 {
+  padding-bottom: var(--space-sm);
+  border-bottom: 2px solid var(--bg-light);
+  margin-bottom: var(--space-md);
+}
+
+/* ── Teal gradient header band ─────────────────────────────────────────────── */
+
+.site-header {
+  background: linear-gradient(135deg, var(--bg-white) 0%, #f0fbfb 100%);
+}
+
+/* ── Sidebar active indicator bar ──────────────────────────────────────────── */
+
+.sidebar-link.active {
+  position: relative;
+}
+
+.sidebar-link.active::before {
+  content: '';
+  position: absolute;
+  left: -16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: var(--primary-teal);
+  border-radius: 0 3px 3px 0;
+}
+
+/* ── Print / PDF export ────────────────────────────────────────────────────── */
+
+@media print {
+  .sidebar,
+  .site-header,
+  .site-footer,
+  .form-actions,
+  .drop-zone,
+  .file-list,
+  #upload,
+  .progress-wrap {
+    display: none !important;
+  }
+
+  .layout-wrapper {
+    display: block;
+  }
+
+  .main-content {
+    padding: 0;
+  }
+
+  .metric-card {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+}

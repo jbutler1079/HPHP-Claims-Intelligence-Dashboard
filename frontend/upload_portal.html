@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HPHP Claims Intelligence Platform – Upload Portal</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Serif+4:wght@300;400;600&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- HPHP CSS Design System -->
+  <link rel="stylesheet" href="styles/base.css" />
+  <link rel="stylesheet" href="styles/layout.css" />
+  <link rel="stylesheet" href="styles/components.css" />
+  <link rel="stylesheet" href="styles/dashboard.css" />
+  <link rel="stylesheet" href="styles/theme.css" />
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-logo">HPHP</span>
+        <span class="brand-tagline">Claims Intelligence Platform</span>
+      </div>
+      <nav class="header-nav">
+        <a href="#upload" class="nav-link active">Upload Portal</a>
+        <a href="#status" class="nav-link">Ingestion Status</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===== LAYOUT WRAPPER ===== -->
+  <div class="layout-wrapper">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <p class="sidebar-section-label">Dashboard Views</p>
+        <ul>
+          <li><a href="#" class="sidebar-link active">Executive Overview</a></li>
+          <li><a href="#" class="sidebar-link">Financial</a></li>
+          <li><a href="#" class="sidebar-link">Clinical</a></li>
+          <li><a href="#" class="sidebar-link">Pharmacy</a></li>
+          <li><a href="#" class="sidebar-link">Leakage</a></li>
+          <li><a href="#" class="sidebar-link">Volatility</a></li>
+          <li><a href="#" class="sidebar-link">Operations</a></li>
+        </ul>
+        <p class="sidebar-section-label" style="margin-top:32px;">Data Management</p>
+        <ul>
+          <li><a href="#upload" class="sidebar-link">Upload Claims</a></li>
+          <li><a href="#status" class="sidebar-link">Ingestion Log</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+
+      <!-- Page title -->
+      <section class="page-header">
+        <h1>Claims Data Upload Portal</h1>
+        <p class="page-subtitle">
+          Upload TPA medical and pharmacy claims files for automated validation,
+          normalization, and ingestion into the HPHP data warehouse.
+        </p>
+      </section>
+
+      <!-- Metric summary cards -->
+      <div class="dashboard-grid" id="metric-cards">
+        <div class="metric-card">
+          <div class="metric-label">Files Uploaded</div>
+          <div class="metric-value" id="stat-files">0</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Records Processed</div>
+          <div class="metric-value" id="stat-records">0</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Last Upload</div>
+          <div class="metric-value" id="stat-last" style="font-size:18px;">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Validation Status</div>
+          <div class="metric-value" id="stat-status" style="font-size:18px;">—</div>
+        </div>
+      </div>
+
+      <!-- Upload form -->
+      <section class="card" id="upload" style="margin-top:32px;">
+        <h2>Upload Claims Files</h2>
+        <p class="card-description">
+          Accepted formats: <strong>.csv</strong> or <strong>.xlsx</strong>.
+          All PHI is automatically removed during ingestion.
+        </p>
+
+        <form id="upload-form" enctype="multipart/form-data" novalidate>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="tpa-source">TPA / PBM Source</label>
+              <select id="tpa-source" name="tpa_source" class="form-control">
+                <option value="">— Select Source —</option>
+                <option value="TPA_A">TPA A – Medical</option>
+                <option value="TPA_A_RX">TPA A – Pharmacy</option>
+                <option value="TPA_B">TPA B – Medical</option>
+                <option value="TPA_B_RX">TPA B – Pharmacy</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="report-month">Report Month</label>
+              <input
+                type="month"
+                id="report-month"
+                name="report_month"
+                class="form-control"
+              />
+            </div>
+          </div>
+
+          <!-- Drop zone -->
+          <div
+            class="drop-zone"
+            id="drop-zone"
+            role="button"
+            tabindex="0"
+            aria-label="File drop zone"
+          >
+            <div class="drop-zone-icon">📂</div>
+            <p class="drop-zone-text">
+              Drag &amp; drop files here, or <span class="drop-zone-link">browse</span>
+            </p>
+            <p class="drop-zone-hint">Supports .csv and .xlsx — up to 50 MB each</p>
+            <input
+              type="file"
+              id="file-input"
+              name="files[]"
+              multiple
+              accept=".csv,.xlsx,.xls"
+              class="visually-hidden"
+            />
+          </div>
+
+          <!-- File list -->
+          <ul class="file-list" id="file-list" aria-live="polite"></ul>
+
+          <div class="form-actions">
+            <button type="submit" id="submit-btn" class="btn btn-primary" disabled>
+              Upload &amp; Process
+            </button>
+            <button type="button" id="clear-btn" class="btn btn-secondary">
+              Clear
+            </button>
+          </div>
+
+        </form>
+
+        <!-- Progress bar -->
+        <div class="progress-wrap" id="progress-wrap" hidden>
+          <div class="progress-bar" id="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+            <span class="progress-label" id="progress-label">0%</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Ingestion results -->
+      <section class="card" id="status" style="margin-top:32px;">
+        <h2>Ingestion Report</h2>
+        <div id="ingestion-report" class="report-placeholder">
+          No uploads yet. Submit files above to see results.
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer">
+    <p>&copy; 2024 High Plains Health Plan · Claims Intelligence Platform</p>
+  </footer>
+
+  <!-- API base URL: override window.HPHP_API_BASE before upload.js to point at your Render deployment -->
+  <!-- Example: <script>window.HPHP_API_BASE = "https://your-render-service.onrender.com";</script> -->
+  <script src="upload.js"></script>
+</body>
+</html>
