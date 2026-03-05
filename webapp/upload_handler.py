@@ -14,7 +14,7 @@ from scripts.validate_claim_file import validate_claim_file
 from scripts.process_medical_claims import process_medical_claims
 from scripts.process_pharmacy_claims import process_pharmacy_claims
 from scripts.append_to_master_dataset import append_medical_claims, append_pharmacy_claims
-from webapp.onedrive_sync import upload_master
+from webapp.supabase_db import upsert_medical, upsert_pharmacy, upsert_members
 
 RAW_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "raw")
 
@@ -83,14 +83,14 @@ def handle_upload(file_bytes: bytes, filename: str, tpa_source: str = "", report
     file_type = validation["detected_file_type"]
     if file_type == "medical":
         result = process_medical_claims(df, tpa_source=tpa_source, report_month=report_month)
-        storage = append_medical_claims(result["data"])
-        upload_master("medical")
-        upload_master("members")
+        storage = append_medical_claims(result["data"])  # local CSV fallback
+        upsert_medical(result["data"])                   # persist to Supabase
+        upsert_members(result["data"])
     else:
         result = process_pharmacy_claims(df, tpa_source=tpa_source, report_month=report_month)
-        storage = append_pharmacy_claims(result["data"])
-        upload_master("pharmacy")
-        upload_master("members")
+        storage = append_pharmacy_claims(result["data"])  # local CSV fallback
+        upsert_pharmacy(result["data"])                   # persist to Supabase
+        upsert_members(result["data"])
 
     return {
         "status": "accepted",
