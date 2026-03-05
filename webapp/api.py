@@ -39,7 +39,19 @@ def _allowed_file(filename: str) -> bool:
 
 @app.route("/", methods=["GET"])
 def index():
-    return send_from_directory(FRONTEND_DIR, "wordpress_upload_embed.html")
+    embed_path = os.path.join(FRONTEND_DIR, "wordpress_upload_embed.html")
+    with open(embed_path, "r", encoding="utf-8") as fh:
+        embed = fh.read()
+    full_page = (
+        "<!DOCTYPE html><html lang='en'><head>"
+        "<meta charset='UTF-8'>"
+        "<meta name='viewport' content='width=device-width, initial-scale=1'>"
+        "<title>HPHP Claims Intelligence Platform</title>"
+        "</head><body style='margin:0;background:#0b1e28;'>"
+        + embed +
+        "</body></html>"
+    )
+    return full_page, 200, {"Content-Type": "text/html; charset=utf-8"}
 
 
 @app.route("/frontend/<path:filename>", methods=["GET"])
