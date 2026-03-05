@@ -1,0 +1,3 @@
+# Processed master datasets are stored here
+# medical_claims_master.csv, pharmacy_claims_master.csv, members_master.csv
+# These files are excluded from version control via .gitignore

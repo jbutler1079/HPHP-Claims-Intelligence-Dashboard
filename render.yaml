@@ -1,0 +1,47 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Render Blueprint — HPHP Claims Intelligence Platform
+# Deploy: https://dashboard.render.com/select-repo  → select this repo
+# Docs:   https://render.com/docs/blueprint-spec
+# ═══════════════════════════════════════════════════════════════════════════
+
+services:
+  - type: web
+    name: hphp-claims-api
+    runtime: python
+    plan: free               # upgrade to "starter" for a persistent disk
+    region: oregon           # change to oregon / frankfurt / singapore as needed
+    branch: main             # the branch Render watches for auto-deploys
+
+    buildCommand: pip install -r requirements.txt
+
+    # gunicorn is already in requirements.txt.
+    # $PORT is injected by Render automatically.
+    startCommand: >
+      gunicorn webapp.api:app
+      --workers 2
+      --bind 0.0.0.0:$PORT
+      --timeout 120
+      --access-logfile -
+
+    healthCheckPath: /health
+
+    envVars:
+      - key: FLASK_DEBUG
+        value: "false"
+
+      # Comma-separated list of allowed CORS origins.
+      # Set this to your WordPress site URL in the Render dashboard, e.g.:
+      #   https://yourwordpresssite.com
+      # Use * to allow all origins (not recommended in production).
+      - key: CORS_ORIGINS
+        value: "*"
+        # sync: false  ← uncomment and remove the value line above once you
+        #                paste your real WordPress URL in the Render dashboard.
+
+    # ── Persistent disk (paid plans only) ───────────────────────────────────
+    # Uncomment the block below if you upgrade to a paid plan.
+    # Without a disk the processed CSV files are reset on every deploy.
+    # disk:
+    #   name: claims-data
+    #   mountPath: /opt/render/project/src/data
+    #   sizeGB: 1
