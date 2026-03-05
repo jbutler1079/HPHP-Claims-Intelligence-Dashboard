@@ -31,6 +31,23 @@
   var MAX_SIZE  = 50 * 1024 * 1024;
   var ALLOWED   = ["csv", "xlsx", "xls"];
 
+  // ─── Make file input a transparent clickable overlay over the drop zone ───
+  // This overrides any CSS display:none so the user clicks the input directly,
+  // guaranteeing the change event fires after file selection.
+  if (fileInput) {
+    fileInput.style.cssText = [
+      "display:block",
+      "position:absolute",
+      "top:0",
+      "left:0",
+      "width:100%",
+      "height:100%",
+      "opacity:0",
+      "cursor:pointer",
+      "z-index:10"
+    ].join(";");
+  }
+
   // ═══════════════ UTILS ═══════════════
   function fmtBytes(n) {
     if (n < 1024) return n + " B";
