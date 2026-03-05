@@ -57,10 +57,15 @@ def process_pharmacy_claims(df: pd.DataFrame, tpa_source: str = "", report_month
     if report_month and "report_month" not in df.columns:
         df["report_month"] = report_month
 
-    # Coerce numeric types
+    # Coerce numeric types (strip currency formatting first: $, commas, parens)
     for col in ("ingredient_cost", "plan_paid", "member_paid", "days_supply", "quantity"):
         if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce")
+            cleaned = (
+                df[col].astype(str)
+                .str.replace(r"[$,\s]", "", regex=True)
+                .str.replace(r"^\((.+)\)$", r"-\1", regex=True)
+            )
+            df[col] = pd.to_numeric(cleaned, errors="coerce")
 
     # Coerce date
     if "fill_date" in df.columns:
