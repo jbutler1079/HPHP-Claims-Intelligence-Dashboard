@@ -460,14 +460,14 @@
       </div>
 
       <!-- Drop Zone -->
-      <label class="hci-drop" id="hci-drop" for="hci-files" aria-label="File drop zone">
+      <div class="hci-drop" id="hci-drop" aria-label="File drop zone">
         <div class="hci-drop__icon" aria-hidden="true">&#8682;</div>
         <p class="hci-drop__lead">
           Drag claims files here, or <span class="hci-drop__browse" id="hci-browse">browse from device</span>
         </p>
         <p class="hci-drop__sub">Up to 4 files per batch &middot; CSV and Excel formats &middot; 50 MB max each</p>
         <input type="file" id="hci-files" name="files[]" accept=".csv,.xlsx,.xls" multiple>
-      </label>
+      </div>
 
       <!-- Selected Files -->
       <ul class="hci-files" id="hci-file-list" aria-live="polite"></ul>
@@ -533,4 +533,4 @@
 </section>
 
 <!-- ── Script (loaded from Render — no inline JS needed in WordPress) ───────── -->
-<script src="https://hphp-claims-api.onrender.com/static/app.js" defer></script>
+<script src="https://hphp-claims-api.onrender.com/static/app.js?v=3"></script>

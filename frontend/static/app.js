@@ -207,19 +207,33 @@
   }
 
   // ═══════════════ EVENTS: FILE SELECTION ═══════════════
-  // Note: drop zone is a <label for="hci-files"> — browser opens file dialog natively on click.
+  // The file input is a transparent absolute overlay covering .hci-drop (z-index:10).
+  // Clicks anywhere on the drop zone hit the input directly — no JS .click() needed.
+  // The drop zone is a <div> (NOT a <label for=...>) to avoid the double-trigger bug
+  // where the label re-fires a click on the input after the input already opened the dialog.
 
   fileInput.addEventListener("change", function () { addFiles(fileInput.files); });
 
-  ["dragenter", "dragover"].forEach(function (evt) {
-    drop.addEventListener(evt, function (e) { e.preventDefault(); drop.classList.add("is-active"); });
+  // Drag events on the input overlay — it sits on top so it receives drags first.
+  // dragover must preventDefault to allow drop; do NOT preventDefault on 'drop' so the
+  // browser natively populates fileInput.files and fires the 'change' event above.
+  fileInput.addEventListener("dragenter", function (e) { e.preventDefault(); drop.classList.add("is-active"); });
+  fileInput.addEventListener("dragover",  function (e) { e.preventDefault(); drop.classList.add("is-active"); });
+  fileInput.addEventListener("dragleave", function (e) {
+    if (!e.relatedTarget || !drop.contains(e.relatedTarget)) drop.classList.remove("is-active");
   });
-  ["dragleave", "drop"].forEach(function (evt) {
-    drop.addEventListener(evt, function (e) {
-      e.preventDefault();
-      if (evt === "drop" && e.dataTransfer) addFiles(e.dataTransfer.files);
-      drop.classList.remove("is-active");
-    });
+  fileInput.addEventListener("drop", function () { drop.classList.remove("is-active"); });
+
+  // Fallback drag handlers on the drop zone div (events bubble up from the input).
+  drop.addEventListener("dragenter", function (e) { e.preventDefault(); drop.classList.add("is-active"); });
+  drop.addEventListener("dragover",  function (e) { e.preventDefault(); });
+  drop.addEventListener("dragleave", function (e) {
+    if (!e.relatedTarget || !drop.contains(e.relatedTarget)) drop.classList.remove("is-active");
+  });
+  drop.addEventListener("drop", function (e) {
+    e.preventDefault();
+    drop.classList.remove("is-active");
+    if (e.dataTransfer && e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
   });
 
   fileList.addEventListener("click", function (e) {
