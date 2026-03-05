@@ -226,12 +226,14 @@ def validate_claim_file(
     for col in missing:
         # Map fill_date to service_date if present
         if col == "fill_date" and "service_date" in df.columns:
-            df["fill_date"] = df["service_date"]
+            df[col] = df["service_date"].astype(str)
         # Map plan_paid to paid_amount if present
         elif col == "plan_paid" and "paid_amount" in df.columns:
-            df["plan_paid"] = df["paid_amount"]
+            df[col] = df["paid_amount"].astype(str)
         else:
             df[col] = ""
+    # Ensure all columns are string type
+    df = df.astype(str)
     report["missing_columns"] = missing
 
     # Date validation
