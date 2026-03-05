@@ -23,10 +23,19 @@ def remove_phi_columns(df: pd.DataFrame) -> tuple:
 
 def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Apply the COLUMN_MAPPING to standardize column names.
+    Apply the COLUMN_MAPPING to standardize column names (case-insensitive).
     Any columns not found in the mapping are left unchanged.
     """
-    return df.rename(columns=COLUMN_MAPPING)
+    ci_map = {k.strip().lower(): v for k, v in COLUMN_MAPPING.items()}
+    target_names = set(COLUMN_MAPPING.values())
+    renamed = {}
+    for col in df.columns:
+        key = col.strip().lower()
+        if key in ci_map:
+            renamed[col] = ci_map[key]
+        elif key in target_names:
+            renamed[col] = key
+    return df.rename(columns=renamed)
 
 
 def normalize_and_clean(df: pd.DataFrame) -> tuple:

@@ -10,13 +10,22 @@ import sys
 # Ensure project root is on the path so sibling packages resolve correctly
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 
 from webapp.upload_handler import handle_upload
 
+FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
+
 app = Flask(__name__)
-CORS(app)
+
+# Read allowed origins from the environment so the WordPress domain can be
+# locked in via the Render dashboard without changing code.
+# CORS_ORIGINS accepts "*" or a comma-separated list of origins, e.g.:
+#   https://yourwordpresssite.com,https://www.yourwordpresssite.com
+_raw_origins = os.environ.get("CORS_ORIGINS", "*").strip()
+_cors_origins = "*" if _raw_origins == "*" else [o.strip() for o in _raw_origins.split(",")]
+CORS(app, origins=_cors_origins)
 
 ALLOWED_EXTENSIONS = {".csv", ".xlsx", ".xls"}
 MAX_CONTENT_LENGTH = 50 * 1024 * 1024  # 50 MB
@@ -30,7 +39,12 @@ def _allowed_file(filename: str) -> bool:
 
 @app.route("/", methods=["GET"])
 def index():
-    return jsonify({"service": "HPHP Claims Intelligence API", "status": "running"})
+    return send_from_directory(FRONTEND_DIR, "wordpress_upload_embed.html")
+
+
+@app.route("/frontend/<path:filename>", methods=["GET"])
+def frontend_static(filename):
+    return send_from_directory(FRONTEND_DIR, filename)
 
 
 @app.route("/health", methods=["GET"])
@@ -68,12 +82,27 @@ def upload():
             continue
 
         file_bytes = file.read()
-        result = handle_upload(
-            file_bytes=file_bytes,
-            filename=file.filename,
-            tpa_source=tpa_source,
-            report_month=report_month,
-        )
+        try:
+            result = handle_upload(
+                file_bytes=file_bytes,
+                filename=file.filename,
+                tpa_source=tpa_source,
+                report_month=report_month,
+            )
+        except Exception as exc:
+            result = {
+                "status": "rejected",
+                "filename": file.filename,
+                "validation": {
+                    "file_name": file.filename,
+                    "rows_processed": 0,
+                    "missing_columns": [],
+                    "invalid_fields": [f"server_error:{exc}"],
+                    "detected_file_type": "unknown",
+                    "validation_status": "failed",
+                    "phi_columns_removed": [],
+                },
+            }
         reports.append(result)
 
     accepted = sum(1 for r in reports if r.get("status") == "accepted")

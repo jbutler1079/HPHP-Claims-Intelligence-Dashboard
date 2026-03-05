@@ -74,7 +74,9 @@ def handle_upload(file_bytes: bytes, filename: str, tpa_source: str = "", report
     if ext == ".csv":
         df = pd.read_csv(buf, dtype=str)
     else:
-        df = pd.read_excel(buf, dtype=str)
+        # Use the same smart sheet detection as validation
+        from scripts.validate_claim_file import _best_excel_sheet
+        df = _best_excel_sheet(buf)
 
     # Process based on detected type
     file_type = validation["detected_file_type"]

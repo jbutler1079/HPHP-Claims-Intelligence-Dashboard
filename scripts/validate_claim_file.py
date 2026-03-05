@@ -21,13 +21,24 @@ from config.column_mapping import (
 )
 
 
+def _best_excel_sheet(buf, engine=None) -> pd.DataFrame:
+    """Read the Excel sheet with the most columns (skips empty/summary tabs)."""
+    xls = pd.ExcelFile(buf, engine=engine)
+    best_df = pd.DataFrame()
+    for name in xls.sheet_names:
+        df = pd.read_excel(xls, sheet_name=name, dtype=str)
+        if len(df.columns) > len(best_df.columns):
+            best_df = df
+    return best_df
+
+
 def _load_dataframe(file_path: str) -> pd.DataFrame:
     """Load a CSV or Excel file into a DataFrame."""
     ext = os.path.splitext(file_path)[1].lower()
     if ext == ".csv":
         return pd.read_csv(file_path, dtype=str)
     if ext in (".xlsx", ".xls"):
-        return pd.read_excel(file_path, dtype=str)
+        return _best_excel_sheet(file_path)
     raise ValueError(f"Unsupported file type: {ext!r}")
 
 
@@ -38,13 +49,24 @@ def _load_dataframe_from_bytes(data: bytes, filename: str) -> pd.DataFrame:
     if ext == ".csv":
         return pd.read_csv(buf, dtype=str)
     if ext in (".xlsx", ".xls"):
-        return pd.read_excel(buf, dtype=str)
+        return _best_excel_sheet(buf)
     raise ValueError(f"Unsupported file type: {ext!r}")
 
 
 def _normalize_column_names(df: pd.DataFrame) -> pd.DataFrame:
-    """Apply the column mapping to normalize column headers."""
-    return df.rename(columns=COLUMN_MAPPING)
+    """Apply the column mapping to normalize column headers (case-insensitive)."""
+    # Build a case-insensitive lookup: stripped/lowered raw name -> normalized name
+    ci_map = {k.strip().lower(): v for k, v in COLUMN_MAPPING.items()}
+    # Also accept columns that are already in normalized form (e.g. "member_id")
+    target_names = set(COLUMN_MAPPING.values())
+    renamed = {}
+    for col in df.columns:
+        key = col.strip().lower()
+        if key in ci_map:
+            renamed[col] = ci_map[key]
+        elif key in target_names:
+            renamed[col] = key  # already normalized, just fix casing
+    return df.rename(columns=renamed)
 
 
 def _detect_file_type(columns: list) -> str:
@@ -64,24 +86,34 @@ def _detect_phi_columns(columns: list) -> list:
 
 
 def _validate_dates(df: pd.DataFrame, date_columns: list) -> list:
-    """Return list of columns where date parsing fails for any row."""
+    """Return columns with non-empty date values that fail parsing."""
     invalid = []
     for col in date_columns:
         if col not in df.columns:
             continue
-        parsed = pd.to_datetime(df[col], errors="coerce")
+        # Empty strings/nulls are treated as missing, not invalid values.
+        raw = df[col]
+        present_mask = raw.notna() & (raw.astype(str).str.strip() != "")
+        if not present_mask.any():
+            continue
+        parsed = pd.to_datetime(raw[present_mask], errors="coerce")
         if parsed.isna().any():
             invalid.append(col)
     return invalid
 
 
 def _validate_numerics(df: pd.DataFrame, numeric_columns: list) -> list:
-    """Return list of columns where numeric conversion fails for any row."""
+    """Return columns with non-empty numeric values that fail conversion."""
     invalid = []
     for col in numeric_columns:
         if col not in df.columns:
             continue
-        converted = pd.to_numeric(df[col], errors="coerce")
+        # Empty strings/nulls are treated as missing, not invalid values.
+        raw = df[col]
+        present_mask = raw.notna() & (raw.astype(str).str.strip() != "")
+        if not present_mask.any():
+            continue
+        converted = pd.to_numeric(raw[present_mask], errors="coerce")
         if converted.isna().any():
             invalid.append(col)
     return invalid

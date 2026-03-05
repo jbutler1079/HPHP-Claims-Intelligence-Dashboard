@@ -116,6 +116,12 @@
       '<p class="report-placeholder">No uploads yet. Submit files above to see results.</p>';
   }
 
+  function resetSelectionOnly() {
+    selectedFiles = [];
+    fileInput.value = "";
+    renderFileList();
+  }
+
   // ── Event: drop zone click / keyboard ────────────────────────────────────────
 
   dropZone.addEventListener("click", function () {
@@ -275,7 +281,7 @@
       setTimeout(function () {
         hideProgress();
         renderReport(data);
-        clearFiles();
+        resetSelectionOnly();
       }, 600);
 
     } catch (err) {

@@ -109,6 +109,21 @@ curl -X POST http://localhost:5000/upload \
   -F "report_month=2024-01"
 ```
 
+### WordPress Drop-In Upload Block
+
+Use `frontend/wordpress_upload_embed.html` when you need a single HTML/CSS block that can be pasted into a WordPress `Custom HTML` block.
+
+1. Copy the full contents of `frontend/wordpress_upload_embed.html`.
+2. Paste into a WordPress page using a `Custom HTML` block.
+3. Update the form `action` URL to your deployed API endpoint, for example:
+
+```html
+https://your-render-service.onrender.com/upload
+```
+
+The block submits multipart form data using the same field names expected by the API:
+`files[]`, `tpa_source`, and `report_month`.
+
 ---
 
 ## Upload Workflow
