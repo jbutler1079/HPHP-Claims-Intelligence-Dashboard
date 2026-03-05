@@ -13,10 +13,14 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from flask import Flask, request, jsonify, send_from_directory, make_response
 
 from webapp.upload_handler import handle_upload
+from webapp.onedrive_sync import download_masters
 
 FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
 
 app = Flask(__name__)
+
+# Restore master CSVs from OneDrive on every cold start (Render filesystem is ephemeral).
+download_masters()
 
 # Manual CORS — inject headers on every response so the browser preflight succeeds.
 # This bypasses flask-cors entirely and is guaranteed to work.
