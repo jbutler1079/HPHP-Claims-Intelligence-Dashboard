@@ -10,8 +10,7 @@ import sys
 # Ensure project root is on the path so sibling packages resolve correctly
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from flask import Flask, request, jsonify, send_from_directory
-from flask_cors import CORS, cross_origin
+from flask import Flask, request, jsonify, send_from_directory, make_response
 
 from webapp.upload_handler import handle_upload
 
@@ -19,13 +18,26 @@ FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__fi
 
 app = Flask(__name__)
 
-# Read allowed origins from the environment so the WordPress domain can be
-# locked in via the Render dashboard without changing code.
-# CORS_ORIGINS accepts "*" or a comma-separated list of origins, e.g.:
-#   https://yourwordpresssite.com,https://www.yourwordpresssite.com
-_raw_origins = os.environ.get("CORS_ORIGINS", "*").strip()
-_cors_origins = "*" if _raw_origins == "*" else [o.strip() for o in _raw_origins.split(",")]
-CORS(app, origins=_cors_origins)
+# Manual CORS — inject headers on every response so the browser preflight succeeds.
+# This bypasses flask-cors entirely and is guaranteed to work.
+@app.after_request
+def _add_cors(response):
+    response.headers["Access-Control-Allow-Origin"]  = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    response.headers["Access-Control-Max-Age"]       = "86400"
+    return response
+
+# Handle preflight OPTIONS requests for every route.
+@app.before_request
+def _handle_options():
+    if request.method == "OPTIONS":
+        resp = make_response("", 204)
+        resp.headers["Access-Control-Allow-Origin"]  = "*"
+        resp.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+        resp.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+        resp.headers["Access-Control-Max-Age"]       = "86400"
+        return resp
 
 ALLOWED_EXTENSIONS = {".csv", ".xlsx", ".xls"}
 MAX_CONTENT_LENGTH = 50 * 1024 * 1024  # 50 MB
@@ -59,7 +71,6 @@ def health():
 
 
 @app.route("/upload", methods=["POST"])
-@cross_origin(origins="*")
 def upload():
     """
     Accept one or more claims files.
