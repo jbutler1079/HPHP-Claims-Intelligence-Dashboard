@@ -103,7 +103,11 @@ def _validate_dates(df: pd.DataFrame, date_columns: list) -> list:
 
 
 def _validate_numerics(df: pd.DataFrame, numeric_columns: list) -> list:
-    """Return columns with non-empty numeric values that fail conversion."""
+    """Return columns with non-empty numeric values that fail conversion.
+
+    Accepts currency-formatted values (e.g. ``$1,234.56``, ``(500.00)``) by
+    stripping ``$``, commas, and parenthetical negatives before conversion.
+    """
     invalid = []
     for col in numeric_columns:
         if col not in df.columns:
@@ -113,7 +117,14 @@ def _validate_numerics(df: pd.DataFrame, numeric_columns: list) -> list:
         present_mask = raw.notna() & (raw.astype(str).str.strip() != "")
         if not present_mask.any():
             continue
-        converted = pd.to_numeric(raw[present_mask], errors="coerce")
+        # Normalise common currency formatting before numeric coercion.
+        cleaned = (
+            raw[present_mask]
+            .astype(str)
+            .str.replace(r"[$,\s]", "", regex=True)         # strip $, commas, spaces
+            .str.replace(r"^\((.+)\)$", r"-\1", regex=True) # (123.45) -> -123.45
+        )
+        converted = pd.to_numeric(cleaned, errors="coerce")
         if converted.isna().any():
             invalid.append(col)
     return invalid
