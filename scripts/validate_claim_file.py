@@ -220,10 +220,18 @@ def validate_claim_file(
         date_cols = ["fill_date"]
         numeric_cols = ["ingredient_cost", "plan_paid", "member_paid"]
 
-    # Auto-add missing required columns as blanks
+
+    # Auto-add missing required columns as blanks, with smart mapping
     missing = [c for c in required if c not in df.columns]
     for col in missing:
-        df[col] = ""
+        # Map fill_date to service_date if present
+        if col == "fill_date" and "service_date" in df.columns:
+            df["fill_date"] = df["service_date"]
+        # Map plan_paid to paid_amount if present
+        elif col == "plan_paid" and "paid_amount" in df.columns:
+            df["plan_paid"] = df["paid_amount"]
+        else:
+            df[col] = ""
     report["missing_columns"] = missing
 
     # Date validation
