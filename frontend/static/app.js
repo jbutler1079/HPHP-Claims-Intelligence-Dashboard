@@ -31,22 +31,10 @@
   var MAX_SIZE  = 50 * 1024 * 1024;
   var ALLOWED   = ["csv", "xlsx", "xls"];
 
-  // ─── Make file input a transparent clickable overlay over the drop zone ───
-  // This overrides any CSS display:none so the user clicks the input directly,
-  // guaranteeing the change event fires after file selection.
-  if (fileInput) {
-    fileInput.style.cssText = [
-      "display:block",
-      "position:absolute",
-      "top:0",
-      "left:0",
-      "width:100%",
-      "height:100%",
-      "opacity:0",
-      "cursor:pointer",
-      "z-index:10"
-    ].join(";");
-  }
+  // Helper: always get the CURRENT input element from the DOM.
+  // WordPress themes can re-render DOM nodes after script load, making the
+  // initial reference stale. Re-querying each time avoids that.
+  function getInput() { return document.getElementById("hci-files"); }
 
   // ═══════════════ UTILS ═══════════════
   function fmtBytes(n) {
@@ -119,7 +107,7 @@
 
   function clearAll() {
     files = [];
-    fileInput.value = "";
+    var fi = getInput(); if (fi) fi.value = "";
     renderFiles();
     hideBar();
     reportEl.innerHTML = "";
@@ -207,26 +195,29 @@
   }
 
   // ═══════════════ EVENTS: FILE SELECTION ═══════════════
-  // The file input is a transparent absolute overlay covering .hci-drop (z-index:10).
-  // Clicks anywhere on the drop zone hit the input directly — no JS .click() needed.
-  // The drop zone is a <div> (NOT a <label for=...>) to avoid the double-trigger bug
-  // where the label re-fires a click on the input after the input already opened the dialog.
-
-  fileInput.addEventListener("change", function () { addFiles(fileInput.files); });
-
-  // Drag events on the input overlay — it sits on top so it receives drags first.
-  // dragover must preventDefault to allow drop; do NOT preventDefault on 'drop' so the
-  // browser natively populates fileInput.files and fires the 'change' event above.
-  fileInput.addEventListener("dragenter", function (e) { e.preventDefault(); drop.classList.add("is-active"); });
-  fileInput.addEventListener("dragover",  function (e) { e.preventDefault(); drop.classList.add("is-active"); });
-  fileInput.addEventListener("dragleave", function (e) {
-    if (!e.relatedTarget || !drop.contains(e.relatedTarget)) drop.classList.remove("is-active");
+  // Use document-level event delegation so the listener survives any DOM
+  // replacement that WordPress themes/plugins might do after script load.
+  document.addEventListener("change", function (e) {
+    if (e.target && e.target.id === "hci-files" && e.target.files) {
+      addFiles(e.target.files);
+    }
   });
-  fileInput.addEventListener("drop", function () { drop.classList.remove("is-active"); });
+  document.addEventListener("input", function (e) {
+    if (e.target && e.target.id === "hci-files" && e.target.files && e.target.files.length) {
+      addFiles(e.target.files);
+    }
+  });
 
-  // Fallback drag handlers on the drop zone div (events bubble up from the input).
+  // Click the drop zone → open file dialog.
+  // Re-query the input each time to handle any post-load DOM replacement.
+  drop.addEventListener("click", function () {
+    var fi = getInput();
+    if (fi) fi.click();
+  });
+
+  // Drag-and-drop on the drop zone div.
   drop.addEventListener("dragenter", function (e) { e.preventDefault(); drop.classList.add("is-active"); });
-  drop.addEventListener("dragover",  function (e) { e.preventDefault(); });
+  drop.addEventListener("dragover",  function (e) { e.preventDefault(); drop.classList.add("is-active"); });
   drop.addEventListener("dragleave", function (e) {
     if (!e.relatedTarget || !drop.contains(e.relatedTarget)) drop.classList.remove("is-active");
   });

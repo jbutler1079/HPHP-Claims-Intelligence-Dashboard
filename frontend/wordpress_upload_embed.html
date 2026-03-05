@@ -213,14 +213,7 @@
 .hci-drop__lead { margin: 0; font-size: 14px; font-weight: 600; color: var(--ink-primary); }
 .hci-drop__browse { color: var(--teal-bright); text-decoration: underline; cursor: pointer; }
 .hci-drop__sub { margin: 8px 0 0; font-size: 12px; color: var(--ink-muted); }
-.hci-drop input[type=file] {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  opacity: 0;
-  cursor: pointer;
-  z-index: 10;
-}
+.hci-drop input[type=file] { display: none; }
 
 /* ═══════════════════  FILE LIST  ═══════════════════ */
 .hci-files { list-style: none; padding: 0; margin: 14px 0 0; display: grid; gap: 8px; }
@@ -533,4 +526,4 @@
 </section>
 
 <!-- ── Script (loaded from Render — no inline JS needed in WordPress) ───────── -->
-<script src="https://hphp-claims-api.onrender.com/static/app.js?v=3"></script>
+<script src="https://hphp-claims-api.onrender.com/static/app.js?v=4"></script>
