@@ -47,6 +47,12 @@ def frontend_static(filename):
     return send_from_directory(FRONTEND_DIR, filename)
 
 
+@app.route("/static/<path:filename>", methods=["GET"])
+def static_files(filename):
+    static_dir = os.path.join(FRONTEND_DIR, "static")
+    return send_from_directory(static_dir, filename)
+
+
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({"status": "healthy"})
