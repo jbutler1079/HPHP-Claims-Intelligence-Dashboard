@@ -529,19 +529,18 @@
 (function () {
   "use strict";
 
-  // ═══════════════ CONFIG ═══════════════
-  // Auto-detects the API URL based on environment:
-  //  ─── API URL CONFIGURATION ──────────────────────────────────────────────
-  //  WordPress / production: add a <script> block BEFORE this HTML block:
-  //    <script>window.HPHP_API_BASE = "https://your-api.onrender.com";</script>
-  //
-  //  Other environments are detected automatically:
-  //    - Same-origin (served by Flask on :5000): uses relative path
-  //    - GitHub Codespaces / Gitpod:             rewrites forwarded-port URL
-  //    - Local dev fallback:                     http://localhost:5000
-  //  ────────────────────────────────────────────────────────────────────────
+  // ╔══════════════════════════════════════════════════════════════╗
+  // ║  CONFIGURE YOUR API URL HERE  (edit this one line)          ║
+  // ║  Set to your Render service URL, no trailing slash.         ║
+  // ╚══════════════════════════════════════════════════════════════╝
+  var HPHP_API_BASE = "https://hphp-claims-api.onrender.com";
+
   var API_URL = (function () {
-    // 1. Explicit override — set window.HPHP_API_BASE before this block loads
+    // 1. Use the inline constant above (works in WordPress without any extra script tag)
+    if (HPHP_API_BASE) {
+      return HPHP_API_BASE.replace(/\/+$/, "") + "/upload";
+    }
+    // 2. window-level override (legacy support)
     if (window.HPHP_API_BASE) {
       return window.HPHP_API_BASE.replace(/\/+$/, "") + "/upload";
     }
