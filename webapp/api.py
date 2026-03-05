@@ -25,7 +25,13 @@ app = Flask(__name__)
 #   https://yourwordpresssite.com,https://www.yourwordpresssite.com
 _raw_origins = os.environ.get("CORS_ORIGINS", "*").strip()
 _cors_origins = "*" if _raw_origins == "*" else [o.strip() for o in _raw_origins.split(",")]
-CORS(app, origins=_cors_origins)
+CORS(
+    app,
+    origins=_cors_origins,
+    supports_credentials=False,
+    send_wildcard=True,
+    automatic_options=True,
+)
 
 ALLOWED_EXTENSIONS = {".csv", ".xlsx", ".xls"}
 MAX_CONTENT_LENGTH = 50 * 1024 * 1024  # 50 MB
@@ -70,7 +76,7 @@ def health():
     return jsonify({"status": "healthy"})
 
 
-@app.route("/upload", methods=["POST"])
+@app.route("/upload", methods=["POST", "OPTIONS"])
 def upload():
     """
     Accept one or more claims files.
